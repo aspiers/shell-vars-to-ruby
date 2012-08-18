@@ -20,7 +20,7 @@ require 'shellwords'
 
 module TF
   class Environment
-    HANDLER=<<EOF.gsub(/\n/,'')
+    HANDLER=<<EOF
 set | awk -F= '
   BEGIN                             {v=0;}
   /^[a-zA-Z_][a-zA-Z0-9_]*=/        {v=1;}
