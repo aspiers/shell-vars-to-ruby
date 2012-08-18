@@ -47,14 +47,26 @@ class TestEnvironment < MiniTest::Unit::TestCase
 
   def run_session(prog, shellcode)
     shell = Session::Sh.new(:prog => prog)
-    result = shell.execute("#{shellcode}\n#{@test.show_env_command}")
+    code = "#{shellcode}\n#{@test.show_env_command}"
+    begin
+      result = shell.execute(code)
+    rescue Session::ExecutionError
+      puts "Failed to execute code (#$!)"
+      puts "code was:"
+      puts "----------"
+      puts code
+      puts "----------"
+      return nil
+    end
     result = result[0].split(/\n/)
-    @test.parse_env( result )
+    yield @test.parse_env( result )
   end
 
   def multi_shell_run(shellcode)
     %w(bash zsh).each do |shell|
-      yield run_session(shell, shellcode)
+      run_session(shell, shellcode) do |result|
+        yield result
+      end
     end
   end
 
@@ -65,56 +77,66 @@ class TestEnvironment < MiniTest::Unit::TestCase
   end
 
   def test_array_assignment_double_quotes_bash
-    result = run_session('bash', 'x=("a" "b")')
-    assert_equal({"0" => "a", "1" => "b"}, result["x"])
+    run_session('bash', 'x=("a" "b")') do |result|
+      assert_equal({"0" => "a", "1" => "b"}, result["x"])
+    end
   end
 
   def test_array_assignment_double_quotes_zsh
-    result = run_session('zsh', 'x=("a" "b")')
-    assert_equal({"1" => "a", "2" => "b"}, result["x"])
+    run_session('zsh', 'x=("a" "b")') do |result|
+      assert_equal({"1" => "a", "2" => "b"}, result["x"])
+    end
   end
 
   def test_array_assignment_single_quotes_bash
-    result = run_session('bash', "x=('a' 'b')")
-    assert_equal({"0" => "a", "1" => "b"}, result["x"])
+    run_session('bash', "x=('a' 'b')") do |result|
+      assert_equal({"0" => "a", "1" => "b"}, result["x"])
+    end
   end
 
   def test_array_assignment_single_quotes_zsh
-    result = run_session('zsh', "x=('a' 'b')")
-    assert_equal({"1" => "a", "2" => "b"}, result["x"])
+    run_session('zsh', "x=('a' 'b')") do |result|
+      assert_equal({"1" => "a", "2" => "b"}, result["x"])
+    end
   end
 
   def test_array_modification_single_quotes_bash
-    result = run_session('bash', "x=('a' 'b'); x[5]=c")
-    assert_equal({"0" => "a", "1" => "b", "5" => "c"}, result["x"])
+    run_session('bash', "x=('a' 'b'); x[5]=c") do |result|
+      assert_equal({"0" => "a", "1" => "b", "5" => "c"}, result["x"])
+    end
   end
 
   def test_array_modification_single_quotes_zsh
-    result = run_session('zsh', "x=('a' 'b'); x[5]=c")
-    assert_equal({"1" => "a", "2" => "b", "5" => "c"}, result["x"])
+    run_session('zsh', "x=('a' 'b'); x[5]=c") do |result|
+      assert_equal({"1" => "a", "2" => "b", "5" => "c"}, result["x"])
+    end
   end
 
   def test_array_and_multiline_bash
-    result = run_session('bash', %!x[1]=a; x[2]=b\nml=$'line one\\nline two'!)
-    assert_equal({"1" => "a", "2" => "b"}, result["x"])
-    assert_equal("line one\nline two", result["ml"])
+    run_session('bash', %!x[1]=a; x[2]=b\nml=$'line one\\nline two'!) do |result|
+      assert_equal({"1" => "a", "2" => "b"}, result["x"])
+      assert_equal("line one\nline two", result["ml"])
+    end
   end
 
   def test_array_and_raw_multiline_bash
-    result = run_session('bash', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!)
-    assert_equal({"1" => "a", "2" => "b"}, result["x"])
-    assert_equal("line one\nline two", result["ml"])
+    run_session('bash', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!) do |result|
+      assert_equal({"1" => "a", "2" => "b"}, result["x"])
+      assert_equal("line one\nline two", result["ml"])
+    end
   end
 
   def test_array_and_multiline_zsh
-    result = run_session('zsh', %!x[1]=a; x[2]=b\nml=$'line one\\nline two'!)
-    assert_equal({"1" => "a", "2" => "b"}, result["x"])
-    assert_equal("line one\nline two", result["ml"])
+    run_session('zsh', %!x[1]=a; x[2]=b\nml=$'line one\\nline two'!) do |result|
+      assert_equal({"1" => "a", "2" => "b"}, result["x"])
+      assert_equal("line one\nline two", result["ml"])
+    end
   end
 
   def test_array_and_raw_multiline_zsh
-    result = run_session('zsh', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!)
-    assert_equal({"1" => "a", "2" => "b"}, result["x"])
-    assert_equal("line one\nline two", result["ml"])
+    run_session('zsh', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!) do |result|
+      assert_equal({"1" => "a", "2" => "b"}, result["x"])
+      assert_equal("line one\nline two", result["ml"])
+    end
   end
 end
