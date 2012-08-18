@@ -5,7 +5,7 @@ The awarded answer should include Ruby code that:
 - can include shell code to simplify reading, but preferable
   should be something small like piping through awk/sed 
 
-- all variables must be read, including arrays and not exported variables 
+- all variables must be read, including arrays and un-exported variables 
 
 - multiline variables have to be read properly, not stoping on single quotes in values -> ' 
 
