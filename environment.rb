@@ -6,7 +6,7 @@ module TF
 i=0
 
 debug () {
-  : echo "$i: $*" >&2
+  echo "$i: $*" >&2
   : $(( i++ ))
 }
 
@@ -77,6 +77,8 @@ fi
 
 #zzzz=$'just\nfor\ntesting'
 #output_variable zzzz
+
+echo 'zzzz: "test"'
 EOF
 
     class << self
