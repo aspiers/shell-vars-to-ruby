@@ -42,14 +42,16 @@ class TestEnvironment < MiniTest::Unit::TestCase
     @test.parse_env( result )
   end
 
-  def test_show_env_command_bash_session
-    result = run_session('bash', 'x=3')
-    assert_equal "3", result["x"]
+  def multi_shell_run(shellcode)
+    %w(bash zsh).each do |shell|
+      yield run_session(shell, shellcode)
+    end
   end
 
-  def test_show_env_command_zsh_session
-    result = run_session('zsh', 'x=3')
-    assert_equal "3", result["x"]
+  def test_simple_assignment
+    multi_shell_run 'x=3' do |result|
+      assert_equal "3", result["x"]
+    end
   end
 
   def test_show_env_command_zsh_popen
