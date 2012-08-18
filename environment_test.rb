@@ -35,6 +35,12 @@ class TestEnvironment < MiniTest::Unit::TestCase
     end
   end
 
+  def test_show_env_command_zsh_popen
+    result = IO.popen("x=3;\n#{@test.show_env_command}") {|io|io.readlines}
+    result = @test.parse_env( result )
+    assert_equal "3", result["x"]
+  end
+
   def run_session(prog, shellcode)
     shell = Session::Sh.new(:prog => prog)
     result = shell.execute("#{shellcode}\n#{@test.show_env_command}")
@@ -54,9 +60,40 @@ class TestEnvironment < MiniTest::Unit::TestCase
     end
   end
 
-  def test_show_env_command_zsh_popen
-    result = IO.popen("x=3;\n#{@test.show_env_command}") {|io|io.readlines}
-    result = @test.parse_env( result )
-    assert_equal "3", result["x"]
+  def test_array_assignment_double_quotes_bash
+    result = run_session('bash', 'x=("a" "b")')
+    assert_equal({"0" => "a", "1" => "b"}, result["x"])
+  end
+
+  def test_array_assignment_double_quotes_zsh
+    result = run_session('zsh', 'x=("a" "b")')
+    assert_equal({"1" => "a", "2" => "b"}, result["x"])
+  end
+
+  def test_array_assignment_single_quotes_bash
+    result = run_session('bash', "x=('a' 'b')")
+    assert_equal({"0" => "a", "1" => "b"}, result["x"])
+  end
+
+  def test_array_assignment_single_quotes_zsh
+    result = run_session('zsh', "x=('a' 'b')")
+    assert_equal({"1" => "a", "2" => "b"}, result["x"])
+  end
+
+  def test_array_modification_single_quotes_bash
+    result = run_session('bash', "x=('a' 'b'); x[5]=c")
+    assert_equal({"0" => "a", "1" => "b", "5" => "c"}, result["x"])
+  end
+
+  def test_array_modification_single_quotes_zsh
+    result = run_session('zsh', "x=('a' 'b'); x[5]=c")
+    assert_equal({"1" => "a", "2" => "b", "5" => "c"}, result["x"])
+  end
+
+  def test_array_and_multiline
+    multi_shell_run %q!x=('a' 'b'); ml=$'line one\nline two'! do |result|
+      assert_equal({"0" => "a", "1" => "b"}, result["x"])
+      assert_equal("line one\nline two", result["ml"])
+    end
   end
 end
