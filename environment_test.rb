@@ -142,14 +142,14 @@ class TestEnvironment < MiniTest::Unit::TestCase
     end
   end
 
-  def test_double_quote_bash
-    run_session('bash', %q!x='a"b'!) do |result|
-      assert_equal('a"b', result["x"])
+  def test_single_quote
+    multi_shell_run %q!x="a'b"! do |result|
+      assert_equal("a'b", result["x"])
     end
   end
 
-  def test_double_quote_zsh
-    run_session('zsh', %q!x='a"b'!) do |result|
+  def test_double_quote
+    multi_shell_run %q!x='a"b'! do |result|
       assert_equal('a"b', result["x"])
     end
   end
