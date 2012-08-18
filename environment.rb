@@ -32,20 +32,36 @@ escape_value () {
   value="${value//$tab/${_tf_escape}t}"
 }
 
+output_bash_array () {
+  varname="$1"
+  echo "\"$varname\":"
+  keys_calculator="echo \${!$varname[@]}"
+  for i in `eval "$keys_calculator"`; do
+    eval "value=\"\${$varname[$i]}\""
+    escape_value
+    echo "  \"$i\": \"$value\""
+  done
+}
+
 output_bash_variables () {
+  # subshell stops us from polluting the output, so
+  # so we only have to be careful not to stomp on anything,
+  # by using _tf_ prefix
+
   # This one doesn't distinguish between normal variables and arrays
   #builtin compgen -A variable | \
 
   builtin declare -p | \
   while read _tf_decl _tf_opts _tf_rest; do
     [ "$_tf_decl" = 'declare' ] || continue
-    [ "$_tf_opts" = '-a' ] && continue
 
     _tf_varname="${_tf_rest%%=*}"
 
-    # subshell stops us from polluting the output, so
-    # so we only have to be careful not to stomp on anything.
-    output_variable $_tf_varname
+    case "$_tf_opts" in
+      -A*) continue ;;
+      -a*) output_bash_array "$_tf_varname" ;;
+        *) output_variable   "$_tf_varname" ;;
+    esac
   done
 }
 
