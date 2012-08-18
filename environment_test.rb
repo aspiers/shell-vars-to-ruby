@@ -13,6 +13,13 @@ class TestEnvironment < MiniTest::Unit::TestCase
     assert_equal "3", result["x"]
   end
 
+  def show_code(code)
+    puts "code was:"
+    puts "----------"
+    puts code
+    puts "----------"
+  end
+
   def run_session(prog, shellcode)
     shell = Session::Sh.new(:prog => prog)
     code = "#{shellcode}\n#{@test.show_env_command}"
@@ -20,10 +27,7 @@ class TestEnvironment < MiniTest::Unit::TestCase
       result = shell.execute(code)
     rescue Session::ExecutionError
       puts "Failed to execute code (#$!)"
-      puts "code was:"
-      puts "----------"
-      puts code
-      puts "----------"
+      show_code(code)
       return nil
     end
     stdout, stderr = *result
