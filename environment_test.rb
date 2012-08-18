@@ -119,14 +119,14 @@ class TestEnvironment < MiniTest::Unit::TestCase
   end
 
   def test_raw_multiline_bash
-    run_session('bash', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!) do |result|
-      assert_equal("line one\nline two", result["ml"])
+    run_session('bash', %!x[1]=a; x[2]=b\nml=$'line one\nline two\nthree'!) do |result|
+      assert_equal("line one\nline two\nthree", result["ml"])
     end
   end
 
   def test_raw_multiline_zsh
-    run_session('zsh', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!) do |result|
-      assert_equal("line one\nline two", result["ml"])
+    run_session('zsh', %!x[1]=a; x[2]=b\nml=$'line one\nline two\nthree'!) do |result|
+      assert_equal("line one\nline two\nthree", result["ml"])
     end
   end
 
