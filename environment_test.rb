@@ -81,7 +81,8 @@ class TestEnvironment < MiniTest::Unit::TestCase
 
   def test_array_modification_single_quotes_zsh
     run_session('zsh', "x=('a' 'b'); x[5]=c") do |result|
-      assert_equal({"1" => "a", "2" => "b", "5" => "c"}, result["x"])
+      # zsh doesn't support sparse arrays
+      assert_equal({"1" => "a", "2" => "b", "3" => "c"}, result["x"])
     end
   end
 

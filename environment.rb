@@ -3,11 +3,11 @@ require 'yaml'
 module TF
   class Environment
     HANDLER=<<'EOF'
-i=0
+_tf_debug_count=0
 
 debug () {
-  echo "$i: $*" >&2
-  : $(( i++ ))
+  echo "$_tf_debug_count: $*" >&2
+  : $(( _tf_debug_count++ ))
 }
 
 output_variable () {
@@ -43,6 +43,19 @@ output_bash_array () {
   done
 }
 
+output_zsh_array () {
+  varname="$1"
+  echo "\"$varname\":"
+  i=1
+  values_calculator="echo \"\${$varname""[@]}\""
+  for value in `eval "$values_calculator"`; do
+    [ -z "$value" ] && continue
+    escape_value
+    echo "  \"$i\": \"$value\""
+    : $(( i++ ))
+  done
+}
+
 output_bash_variables () {
   # subshell stops us from polluting the output, so
   # so we only have to be careful not to stomp on anything,
@@ -68,15 +81,18 @@ output_bash_variables () {
 output_zsh_variables () {
   zmodload zsh/parameter
   for _tf_varname in ${(k)parameters[@]}; do
-    # subshell stops us from polluting the output, so
-    # so we only have to be careful not to stomp on anything.
     case "$_tf_varname" in
       options|commands|fns|functions|builtins|reswords|aliases|widgets|parameters)
-        :
+        continue
         ;;
-      *)
-        [[ $#_tf_varname -gt 100 ]] || output_variable $_tf_varname
-        ;;
+    esac
+
+    param_type="${parameters[$_tf_varname]}"
+    case "$param_type" in
+      scalar*|integer*)
+        output_variable  "$_tf_varname" ;;
+      array*)
+        output_zsh_array "$_tf_varname" ;;
     esac
   done
 }
