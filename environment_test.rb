@@ -35,19 +35,20 @@ class TestEnvironment < MiniTest::Unit::TestCase
     end
   end
 
-  def test_show_env_command_bash_session
-    shell = Session::Sh.new(:prog => 'bash')
-    result = shell.execute("x=3;\n#{@test.show_env_command}")
+  def run_session(prog, shellcode)
+    shell = Session::Sh.new(:prog => prog)
+    result = shell.execute("#{shellcode}\n#{@test.show_env_command}")
     result = result[0].split(/\n/)
-    result = @test.parse_env( result )
+    @test.parse_env( result )
+  end
+
+  def test_show_env_command_bash_session
+    result = run_session('bash', 'x=3')
     assert_equal "3", result["x"]
   end
 
   def test_show_env_command_zsh_session
-    shell = Session::Sh.new(:prog => 'zsh')
-    result = shell.execute("x=3;\n#{@test.show_env_command}")
-    result = result[0].split(/\n/)
-    result = @test.parse_env( result )
+    result = run_session('zsh', 'x=3')
     assert_equal "3", result["x"]
   end
 
