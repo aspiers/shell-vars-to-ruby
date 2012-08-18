@@ -13,6 +13,11 @@ debug () {
 output_variable () {
   varname="$1"
   eval "value=\"\$$varname\""
+  escape_value
+  echo "\"$varname\": \"$value\""
+}
+
+escape_value () {
   debug "$value"
 
   _tf_escape='\'
@@ -31,8 +36,6 @@ output_variable () {
   tab=$'\t'
   value="${value//$tab/${_tf_escape}t}"
   debug "$value"
-
-  echo "\"$varname\": \"$value\""
 }
 
 output_bash_variables () {
