@@ -71,9 +71,12 @@ output_bash_variables () {
     _tf_varname="${_tf_rest%%=*}"
 
     case "$_tf_opts" in
-      -A*) continue ;;
-      -a*) output_bash_array "$_tf_varname" ;;
-        *) output_variable   "$_tf_varname" ;;
+      -a*|-A*)
+        output_bash_array "$_tf_varname"
+        ;;
+      *)
+        output_variable   "$_tf_varname"
+        ;;
     esac
   done
 }
