@@ -3,13 +3,6 @@ require 'yaml'
 module TF
   class Environment
     HANDLER=<<'EOF'
-_tf_debug_count=0
-
-debug () {
-  echo "$_tf_debug_count: $*" >&2
-  : $(( _tf_debug_count++ ))
-}
-
 output_variable () {
   varname="$1"
   eval "value=\"\$$varname\""
@@ -123,11 +116,6 @@ else
   echo "This shell isn't supported yet! ($0)" >&2
   exit 1
 fi
-
-#zzzz=$'just\nfor\ntesting'
-#output_variable zzzz
-
-echo 'zzzz: "test"'
 EOF
 
     class << self
