@@ -56,6 +56,18 @@ output_zsh_array () {
   done
 }
 
+output_zsh_assoc_array () {
+  varname="$1"
+  echo "\"$varname\":"
+  values_calculator="echo \"\${(k)$varname""[@]}\""
+  for key in `eval "$values_calculator"`; do
+    eval "value=\"\${$varname""[$key]}\""
+    #[ -z "$value" ] && continue
+    escape_value
+    echo "  \"$key\": \"$value\""
+  done
+}
+
 output_bash_variables () {
   # subshell stops us from polluting the output, so
   # so we only have to be careful not to stomp on anything,
@@ -96,6 +108,8 @@ output_zsh_variables () {
         output_variable  "$_tf_varname" ;;
       array*)
         output_zsh_array "$_tf_varname" ;;
+      assoc*)
+        output_zsh_assoc_array "$_tf_varname" ;;
     esac
   done
 }

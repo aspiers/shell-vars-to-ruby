@@ -164,8 +164,8 @@ class TestEnvironment < MiniTest::Unit::TestCase
     end
   end
 
-  def test_assoc_array_bash
-    run_session('bash', "declare -A aa; aa['a']=one; aa['b']=two") do |result|
+  def test_assoc_arrays
+    multi_shell_run "declare -A aa; aa[a]=one; aa[b]=two" do |result|
       assert_equal({'a' => 'one', 'b' => 'two' }, result["aa"])
     end
   end
