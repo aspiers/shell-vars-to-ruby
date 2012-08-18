@@ -52,8 +52,8 @@ output_zsh_array () {
 output_zsh_assoc_array () {
   varname="$1"
   echo "\"$varname\":"
-  values_calculator="echo \"\${(k)$varname""[@]}\""
-  for key in `eval "$values_calculator"`; do
+  keys_calculator="echo \"\${(k)$varname""[@]}\""
+  for key in `eval "$keys_calculator"`; do
     eval "value=\"\${$varname""[$key]}\""
     #[ -z "$value" ] && continue
     escape_value
