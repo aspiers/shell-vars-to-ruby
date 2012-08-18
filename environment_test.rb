@@ -153,4 +153,14 @@ class TestEnvironment < MiniTest::Unit::TestCase
       assert_equal('a"b', result["x"])
     end
   end
+
+  def test_var_defs_inside_functions_are_ignored
+    multi_shell_run "x=5\nmyfunc () { x=3; }" do |result|
+      assert_equal "5", result["x"]
+    end
+
+    multi_shell_run "x=5\nmyfunc () {\nx=3\n}" do |result|
+      assert_equal "5", result["x"]
+    end
+  end
 end
