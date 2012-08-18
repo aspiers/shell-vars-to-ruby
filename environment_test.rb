@@ -58,8 +58,13 @@ class TestEnvironment < MiniTest::Unit::TestCase
       puts "----------"
       return nil
     end
-    result = result[0].split(/\n/)
-    yield @test.parse_env( result )
+    stdout, stderr = *result
+    if ! stderr.empty?
+      puts "stderr:\n----------\n#{stderr}----------"
+    end
+    stdout_lines = stdout.split(/\n/)
+    parsed = @test.parse_env(stdout_lines)
+    yield parsed
   end
 
   def multi_shell_run(shellcode)
