@@ -84,12 +84,16 @@ EOF
       end
 
       def parse_array name, value
+        # value is an array containing the shell value inside the ()
+        # of the array's declaration
         if value[0] && value[0].chars.to_a.first == '['
+          # bash
           value = value.map do |string|
             string =~ /\[([^\]]+)\]=(.*)/m
             [ $1, $2 ]
           end
         else
+          # zsh
           value = value.to_enum.with_index.map{|v,i|[(i+1).to_s,v]}.to_a
           # TODO: zsh -c 'typeset -A arr; arr[ala]=1; arr[kot]=2; set | grep -a ^arr=' => arr=(ala 1 kot 2 ) - space on the end
         end

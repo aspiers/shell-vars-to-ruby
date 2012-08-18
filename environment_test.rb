@@ -24,10 +24,14 @@ class TestEnvironment < MiniTest::Unit::TestCase
       "USER=vagrant"           => ["USER",      "vagrant"],
       "variable1='play'\''me'" => ["variable1", "play'me"],
 
+      # bash format
       'variable2=$\'play\n with\n me\n now\'' => ["variable2", 'play\n with\n me\n now'],
+      # zsh format
       "variable2=$'play\n with\n me\n now'"   => ["variable2", "play\n with\n me\n now"],
 
+      # bash format
       'array1=([0]="four" [1]="five" [2]="six" [10]="ten")' => ["array1", {'0'=>'four','1'=>'five','2'=>'six','10'=>'ten'} ],
+      # zsh format
       "array2=(four five six '' '' '' '' '' '' ten)"        => ["array2", {'1'=>'four','2'=>'five','3'=>'six','4'=>'','5'=>'','6'=>'','7'=>'','8'=>'','9'=>'','10'=>'ten'} ]
 
     }.each do |example, result|
