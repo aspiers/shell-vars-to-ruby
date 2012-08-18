@@ -164,6 +164,16 @@ class TestEnvironment < MiniTest::Unit::TestCase
     end
   end
 
+  def test_aliases_are_ignored
+    multi_shell_run "x=5\nalias x=3" do |result|
+      assert_equal "5", result["x"]
+    end
+
+    multi_shell_run "alias x=3\nx=5" do |result|
+      assert_equal "5", result["x"]
+    end
+  end
+
   def test_assoc_arrays
     multi_shell_run "declare -A aa; aa[a]=one; aa[b]=two" do |result|
       assert_equal({'a' => 'one', 'b' => 'two' }, result["aa"])
