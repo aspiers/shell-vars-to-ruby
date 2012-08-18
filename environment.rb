@@ -86,7 +86,7 @@ EOF
       def parse_array name, value
         # value is an array containing the shell value inside the ()
         # of the array's declaration
-        if value[0] && value[0].chars.to_a.first == '['
+        if value[0] && value[0][0] == '['
           # bash
           value = value.map do |string|
             string =~ /\[([^\]]+)\]=(.*)/m
