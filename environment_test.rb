@@ -12,7 +12,7 @@ class TestEnvironment < MiniTest::Unit::TestCase
   end
   def test_parse_array_zsh
     result = @test.parse_array :array_zsh, "four five six '' '' '' '' '' '' ten".shellsplit
-    zsh_expected=[:array_zsh, {'1'=>'four','2'=>'five','3'=>'six','4'=>'','5'=>'','6'=>'','7'=>'','8'=>'','9'=>'','10'=>'ten'} ]
+    zsh_expected=[:array_zsh, {'1'=>'four','2'=>'five','3'=>'six','10'=>'ten'} ]
     assert_equal zsh_expected, result
   end
 
@@ -32,7 +32,7 @@ class TestEnvironment < MiniTest::Unit::TestCase
       # bash format
       'array1=([0]="four" [1]="five" [2]="six" [10]="ten")' => ["array1", {'0'=>'four','1'=>'five','2'=>'six','10'=>'ten'} ],
       # zsh format
-      "array2=(four five six '' '' '' '' '' '' ten)"        => ["array2", {'1'=>'four','2'=>'five','3'=>'six','4'=>'','5'=>'','6'=>'','7'=>'','8'=>'','9'=>'','10'=>'ten'} ]
+      "array2=(four five six '' '' '' '' '' '' ten)"        => ["array2", {'1'=>'four','2'=>'five','3'=>'six','10'=>'ten'} ]
 
     }.each do |example, result|
       assert_equal(result, @test.parse_var( example ) )

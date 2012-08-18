@@ -94,7 +94,8 @@ EOF
           end
         else
           # zsh
-          value = value.to_enum.with_index.map{|v,i|[(i+1).to_s,v]}.to_a
+          value = value.to_enum.with_index.map { |v, i| [(i+1).to_s, v] }
+          value = value.select { |i, v| ! v.empty? }
           # TODO: zsh -c 'typeset -A arr; arr[ala]=1; arr[kot]=2; set | grep -a ^arr=' => arr=(ala 1 kot 2 ) - space on the end
         end
         [ name, Hash[ value ] ]
