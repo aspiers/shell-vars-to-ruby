@@ -3,24 +3,40 @@ require 'yaml'
 module TF
   class Environment
     HANDLER=<<'EOF'
+i=0
+
+debug () {
+  : echo "$i: $*" >&2
+  : $(( i++ ))
+}
+
 output_variable () {
   varname="$1"
   eval "value=\"\$$varname\""
+  debug "$value"
 
-  value="${value//\"/\\\"}"
-
-  nl=$'\n'
   _tf_escape='\'
   [ -n "$ZSH_VERSION" ] && _tf_escape='\\' # urgh
+
+  value="${value//\\/${_tf_escape}${_tf_escape}}"
+  debug "$value"
+
+  value="${value//\"/${_tf_escape}\"}"
+  debug "$value"
+
+  nl=$'\n'
   value="${value//$nl/${_tf_escape}n}"
+  debug "$value"
 
   tab=$'\t'
   value="${value//$tab/${_tf_escape}t}"
+  debug "$value"
 
   echo "\"$varname\": \"$value\""
 }
 
 output_bash_variables () {
+  #echo x | \
   builtin compgen -A variable | \
   while read _tf_varname; do
     # subshell stops us from polluting the output, so
@@ -70,6 +86,7 @@ EOF
         # http://www.yaml.org/spec/1.2/spec.html#id2770814
         output.gsub!(/[\x00-\x08\x0b-\x1f\x7f-\x84\x86-\x9f]/) { |m| "\\x%02x" % m.ord }
 
+        #puts "\nyaml:\n--------------------\n#{output}\n--------------------\n"
         YAML::load(output)
       end
     end
