@@ -28,7 +28,7 @@ class TestEnvironment < MiniTest::Unit::TestCase
     end
     stdout, stderr = *result
     if ! stderr.empty?
-      puts "stderr:\n----------\n#{stderr}----------"
+      puts "\nstderr:\n----------\n#{stderr}----------"
     end
     stdout_lines = stdout.split(/\n/)
     parsed = @test.parse_env(stdout_lines)
