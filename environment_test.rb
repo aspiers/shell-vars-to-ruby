@@ -94,10 +94,27 @@ class TestEnvironment < MiniTest::Unit::TestCase
     assert_equal({"1" => "a", "2" => "b", "5" => "c"}, result["x"])
   end
 
-  def test_array_and_multiline
-    multi_shell_run %q!x=('a' 'b'); ml=$'line one\nline two'! do |result|
-      assert_equal({"0" => "a", "1" => "b"}, result["x"])
-      assert_equal("line one\nline two", result["ml"])
-    end
+  def test_array_and_multiline_bash
+    result = run_session('bash', %!x[1]=a; x[2]=b\nml=$'line one\\nline two'!)
+    assert_equal({"1" => "a", "2" => "b"}, result["x"])
+    assert_equal("line one\nline two", result["ml"])
+  end
+
+  def test_array_and_raw_multiline_bash
+    result = run_session('bash', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!)
+    assert_equal({"1" => "a", "2" => "b"}, result["x"])
+    assert_equal("line one\nline two", result["ml"])
+  end
+
+  def test_array_and_multiline_zsh
+    result = run_session('zsh', %!x[1]=a; x[2]=b\nml=$'line one\\nline two'!)
+    assert_equal({"1" => "a", "2" => "b"}, result["x"])
+    assert_equal("line one\nline two", result["ml"])
+  end
+
+  def test_array_and_raw_multiline_zsh
+    result = run_session('zsh', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!)
+    assert_equal({"1" => "a", "2" => "b"}, result["x"])
+    assert_equal("line one\nline two", result["ml"])
   end
 end
