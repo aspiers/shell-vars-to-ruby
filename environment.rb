@@ -18,30 +18,31 @@ output_variable () {
 }
 
 escape_value () {
-  debug "$value"
-
   _tf_escape='\'
   [ -n "$ZSH_VERSION" ] && _tf_escape='\\' # urgh
 
   value="${value//\\/${_tf_escape}${_tf_escape}}"
-  debug "$value"
 
   value="${value//\"/${_tf_escape}\"}"
-  debug "$value"
 
   nl=$'\n'
   value="${value//$nl/${_tf_escape}n}"
-  debug "$value"
 
   tab=$'\t'
   value="${value//$tab/${_tf_escape}t}"
-  debug "$value"
 }
 
 output_bash_variables () {
-  #echo x | \
-  builtin compgen -A variable | \
-  while read _tf_varname; do
+  # This one doesn't distinguish between normal variables and arrays
+  #builtin compgen -A variable | \
+
+  builtin declare -p | \
+  while read _tf_decl _tf_opts _tf_rest; do
+    [ "$_tf_decl" = 'declare' ] || continue
+    [ "$_tf_opts" = '-a' ] && continue
+
+    _tf_varname="${_tf_rest%%=*}"
+
     # subshell stops us from polluting the output, so
     # so we only have to be careful not to stomp on anything.
     output_variable $_tf_varname
