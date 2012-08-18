@@ -83,22 +83,22 @@ EOF
         end
       end
 
-      def parse_array name, value
-        # value is an array containing the shell value inside the ()
+      def parse_array name, words
+        # words is an array containing the shell words inside the ()
         # of the array's declaration
-        if value[0] && value[0][0] == '['
+        if words[0] && words[0][0] == '['
           # bash
-          value = value.map do |string|
+          values = words.map do |string|
             string =~ /\[([^\]]+)\]=(.*)/m
             [ $1, $2 ]
           end
         else
           # zsh
-          value = value.to_enum.with_index.map { |v, i| [(i+1).to_s, v] }
-          value = value.select { |i, v| ! v.empty? }
+          values = words.to_enum.with_index.map { |v, i| [(i+1).to_s, v] }
+          values = values.select { |i, v| ! v.empty? }
           # TODO: zsh -c 'typeset -A arr; arr[ala]=1; arr[kot]=2; set | grep -a ^arr=' => arr=(ala 1 kot 2 ) - space on the end
         end
-        [ name, Hash[ value ] ]
+        [ name, Hash[ values ] ]
       end
     end
   end
