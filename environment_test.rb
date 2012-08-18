@@ -139,4 +139,16 @@ class TestEnvironment < MiniTest::Unit::TestCase
       assert_equal("line one\nline two", result["ml"])
     end
   end
+
+  def test_raw_multiline_bash
+    run_session('bash', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!) do |result|
+      assert_equal("line one\nline two", result["ml"])
+    end
+  end
+
+  def test_raw_multiline_zsh
+    run_session('zsh', %!x[1]=a; x[2]=b\nml=$'line one\nline two'!) do |result|
+      assert_equal("line one\nline two", result["ml"])
+    end
+  end
 end
